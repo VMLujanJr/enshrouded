@@ -1,8 +1,57 @@
 #! /bin/bash
 
-echo "Starting Enshrouded Dedicated Server..."
-/usr/games/steamcmd +@sSteamCmdForcePlatformType windows +force_install_dir /home/manny/EnshroudedServer/ +login anonymous +app_update 2278520 validate +quit
-/usr/bin/wine64 /home/manny/EnshroudedServer/enshrouded_server.exe
+# Update and Upgrade Linux Ubuntu
+echo "Updating Linux Ubuntu..."
+sudo apt update -y
+echo "Upgrading Linux Ubuntu..."
+sudo apt upgrade -y
+echo "Updating & Upgrading Successful!"
+
+# Pre-install necessary packages
+echo "Installing software-properties-common..."
+sudo apt install software-properties-common wget
+echo "Installing lsb-release..."
+sudo apt install lsb-release wget
+echo "Installing winehq-staging..."
+sudo mkdir -pm755 /etc/apt/keyrings
+sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/dists/$(lsb_release -cs)/winehq-$(lsb_release -cs).sources
+sudo apt update
+sudo apt install --install-recommends winehq-staging -y
+sudo apt install cabextract winbind screen xvfb -y
+echo "Pre-installation successful!"
+
+# Verify SteamCMD Installation
+echo "Verifying if SteamCMD is installed..."
+if command -v steamcmd &> /dev/null/; then
+  echo "steamcmd is already installed."
+else
+  echo "steamcmd is not installed. Installing steamcmd now..."
+  sudo add-apt-repository multiverse -y
+  sudo dpkg --add-architecture i386
+  sudo apt update
+  sudo apt install steamcmd -y
+fi
+
+# Install SteamSDK
+echo "Installing SteamSDK..."
+/usr/games/steamcmd +login anonymous +app_update 1007 validate +quit
+echo "SteamSDK installation successful!"
+
+# Fix SteamSDK
+echo "Creating a sdk64 directory and copying steamclient.so to it..."
+mkdir -p /home/$USER/.steam/sdk64/
+cp /home/$USER/Steam/steamapps/common/Steamworks\ SDK\ Redist/linux64/steamclient.so /home/$USER/.steam/sdk64/#
+
+# Install Enshrouded
+echo "Installing Enshrouded..."
+/usr/games/steamcmd +@sSteamCmdForcePlatformType windows +login anonymous +app_update 2278520 validate +quit
+echo "Installation successful!"
+
+# Launch Enshrouded Server
+echo "Launching Enshrouded..."
+/usr/bin/wine64 /home/$USER/Steam/steamapps/common/EnshroudedServer/enshrouded_server.exe
+echo "Launch successful!"
 
 ## 50. SteamCMD
 
@@ -155,8 +204,6 @@ ExecStart=/home/manny/palserver.sh
 
 [Install]
 WantedBy=multi-user.target
-`
-
 `sudo systemctl daemon-reload`
 
 `sudo systemctl start palworld`
