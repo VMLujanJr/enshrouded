@@ -1,0 +1,12 @@
+[Unit]
+Description=PalWorld Dedicated Server
+After=network.target
+
+[Service]
+Type=simple
+User=manny
+Group=manny
+ExecStart=/home/manny/palserver.sh
+
+[Install]
+WantedBy=multi-user.target

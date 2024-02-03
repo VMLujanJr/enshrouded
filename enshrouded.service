@@ -1,0 +1,16 @@
+[Unit]
+Description=Enshrouded Server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=manny
+Group=manny
+WorkingDirectory=/home/manny/
+ExecStartPre=/usr/games/steamcmd +@sSteamCmdForcePlatformType windows +force_install_dir /home/manny/EnshroudedServer/ +login anonymous +app_update 2278520 validate +quit
+ExecStart=/usr/bin/wine64 /home/manny/EnshroudedServer/enshrouded_server.exe
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
